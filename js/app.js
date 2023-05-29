@@ -1,85 +1,134 @@
-/* let elemento
+const contentAros = document.querySelector("#contentAros");
+const verCarrito = document.querySelector("#verCarrito");
+const contentModal = document.querySelector("#contentModal");
 
-elemento= document
-elemento = document.head
-elemento = document.body
-elemento = document.forms
-elemento = document.scripts
-elemento = document.images
+//Array//
+const productos = [
+  {
+    id: 1,
+    nombre: "Aros Corazon",
+    precio: 1000,
+    img: (src = "image/aros/corazon_inflado250.jpg"),
+    cantidad: 1,
+  },
+  {
+    id: 2,
+    nombre: "Aros Criollitos",
+    precio: 1000,
+    img: (src = "image/aros/criollitos250.jpg"),
+    cantidad: 1,
+  },
+  {
+    id: 3,
+    nombre: "Aros Labrados",
+    precio: 1000,
+    img: (src = "image/aros/inflado_chiquito_labrado250.jpg"),
+    cantidad: 1,
+  },
+  {
+    id: 4,
+    nombre: "Aros Chiquitos",
+    precio: 1000,
+    img: (src = "image/aros/inflado_chiquito250.jpg"),
+    cantidad: 1,
+  },
+];
 
-console.log(elemento) */
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 
-// METODO TRADICIONAL => id, class, tags
+productos.forEach((producto) => {
+  let content = document.createElement("div");
+  content.className = "card";
+  content.innerHTML = `
+        <img src="${producto.img}">
+        <h3>${producto.nombre}</h3>
+        <p class="price">$${producto.precio}</p>
+        
+    `;
 
-/* const navbar = document.getElementsByClassName("navbar") 
-const contenedor = document.getElementsByClassName("container")
-const inputNombre = document.getElementById("inputName")
-const formulario = document.getElementsByTagName("form")
+  contentAros.append(content);
 
-console.log(formulario) */
+  let agregar = document.createElement("button");
+  agregar.innerText = "Agregar";
+  agregar.className = "agregar";
 
-// METODO MODERNO => id, class, tags
+  content.append(agregar);
 
-/* const navbar = document.querySelector(".navbar")
-const contenedor = document.querySelectorAll(".container")
-const inputNombre = document.querySelector("#inputName")
-const formulario = document.querySelector("form")
-console.log(formulario) */
+  agregar.addEventListener("click", () => {
+    carrito.push({
+      id: producto.id,
+      img: producto.img,
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: producto.cantidad,
+    });
+    localGuardar();
+  });
+});
 
-/* const encabezado = document.querySelector("h2").textContent= "Nuevo encabezado desde Javascript"
-console.log(encabezado) */
+const funcionCarrito = () => {
+  contentModal.innerHTML = "";
+  contentModal.style.display = "flex";
+  const modalHeader = document.createElement("div");
+  modalHeader.className = "modal-header";
+  modalHeader.innerHTML = `
+        <h1 class="modal-header-titulo">Carrito</h1>
+    `;
+  contentModal.append(modalHeader);
 
-// Eliminar un elemento del DOM
+  const modalbutton = document.createElement("h1");
+  modalbutton.innerHTML = "X";
+  modalbutton.className = "modal.-header-button";
 
-/* const textDelete = document.querySelector("h5")
-textDelete.remove()
+  modalbutton.addEventListener("click", () => {
+    contentModal.style.display = "none";
+  });
 
-console.log(textDelete) */
+  modalHeader.append(modalbutton);
 
-// Agregar elementos en el DOM
+  carrito.forEach((producto) => {
+    let carritoContent = document.createElement("div");
+    carritoContent.className = "modal-content";
+    carritoContent.innerHTML = `
+        <img src="${producto.img}">
+        <h3>${producto.nombre}</h3>
+        <p>${producto.precio}</p>
+        <p>Cantidad: ${producto.cantidad}</p>
+        `;
 
-/* const textAdded = document.createElement("h5")
-textAdded.innerHTML = "<h5>Texto agregado</h5>"
-document.body.appendChild(textAdded)
+    contentModal.append(carritoContent);
 
-console.log(textAdded) */
+    let eliminar = document.createElement("spam");
+    eliminar.innerHTML = "❌";
+    eliminar.className = "eliminar-producto";
+    carritoContent.append(eliminar);
 
-/* const listaVacia = document.querySelector(".lista-vacia")
+    eliminar.addEventListener("click", eliminarProducto);
+  });
 
-let otrosCursos=["Desarrollo Web","Javascript","ReactJs","NodeJs"]
+  const total = carrito.reduce((acc, el) => acc + el.precio, 0);
 
-for (let curso of otrosCursos){
-    let listado = document.createElement("li")
-    listado.innerHTML= curso
-    listaVacia.appendChild(listado)
-}
+  const totalCompra = document.createElement("div");
+  totalCompra.className = "total-content";
+  totalCompra.innerHTML = `Total a Pagar: ${total} $`;
+  contentModal.append(totalCompra);
+};
 
-console.log(listaVacia) */
+verCarrito.addEventListener("click", funcionCarrito);
 
-// let cursos = [
-//   { id: 1, titulo: "Desarrollo Web", precio: 1000 },
-//   { id: 2, titulo: "Javascript (con carpi y el tio Omar)", precio: 9000 },
-//   { id: 3, titulo: "React Js(Omar)", precio: 1000 },
-//   { id: 4, titulo: "Node Js", precio: 6000 },
-// ];
+const eliminarProducto = () => {
+  const buscarId = carrito.find((element) => element.id);
 
-// for (let curso of cursos) {
-//   let contenedor = document.createElement("div");
-//   contenedor.innerHTML = `
+  carrito = carrito.filter((carritoId) => {
+    return carritoId !== buscarId;
+  });
 
-//     <div class="card border-dark mb-3" style="max-width: 20rem;">
-//     <div class="card-header">${curso.titulo}</div>
-//     <div class="card-body">
-//         <p class="card-text"> $ ${curso.precio}</p>
-//             <button type="button" class="btn btn-dark">Agregar al carrito</button>
-//         </div>
-//     </div>
+  funcionCarrito();
+  localGuardar();
+};
 
-//     `;
+const localGuardar = () => {
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+};
 
-//   document.body.appendChild(contenedor);
-// }
-
-//
-
-// tengo que desarrollar la logica, no hice nada aun
+JSON.parse(localStorage.getItem("carrito"));
